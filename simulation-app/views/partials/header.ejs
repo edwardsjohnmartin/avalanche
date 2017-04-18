@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>Simulation App</title>
+        <link rel="icon" href="../img/favicon.png">
+
+        <!-- JQuery and Bootstrap -->
+        <script src="../js/jquery-3.1.1.min.js"></script>
+        <script src="../js/bootstrap-3.3.7.min.js"></script>
+        <link rel="stylesheet" href="../css/bootstrap-3.3.7.min.css">
+        <link rel="stylesheet" href="../css/bootstrap-theme-3.3.7.min.css">
+
+        <!-- Toastr https://github.com/CodeSeven/toastr -->
+        <script src="../js/toastr-2.1.3.min.js"></script>        
+        <link rel="stylesheet" href="../css/toastr-2.1.3.min.css">
+
+        <!-- pull in socket.io and vuejs -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="../js/vue-debug-2.2.1.js"></script> <!-- TODO change to production vuejs script -->
+
+        <!-- Webgl resources -->
+        <script type="text/javascript" src="../js/webgl/MV.js"></script>
+        <script type="text/javascript" src="../js/webgl/webgl-utils.js"></script>
+        <script type="text/javascript" src="../js/webgl/gl-script.js"></script>
+        <script type="text/javascript" src="../js/shaders/terrain-shaders.js"></script>        
+        <script type="text/javascript" src="../js/shaders/particle-shaders.js"></script>
+
+        <!-- Custom css -->
+        <link rel="stylesheet" href="../css/custom.css">
+    </head>
+    <body>
+        <% include navbar %>

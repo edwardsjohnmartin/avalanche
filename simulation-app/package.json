@@ -1,0 +1,17 @@
+{
+  "name": "simulation-app",
+  "version": "1.0.0",
+  "description": "App that will deliver frames to the UI for rendering with WebGL from a selection of simulations",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "ejs": "*",
+    "express": "*",
+    "nan": "^2.5.1",
+    "socket.io": "*"
+  },
+  "author": "Zackary Hall",
+  "license": "ISC"
+}

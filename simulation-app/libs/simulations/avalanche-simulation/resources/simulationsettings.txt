@@ -1,0 +1,38 @@
+#terrainColorFile	terrain.bmp
+#elevationDEMFile	dem.txt
+#startingZoneFile	startzone.bmp
+#flowPathOutputFile	forcemap
+#pathFile			blank.bmp
+#pathDistanceFile	training_data/data_2_pathdistance.bmp
+#verboseOutput		1
+
+
+terrainColorFile	libs/simulations/avalanche-simulation/resources/normalmap.bmp
+elevationDEMFile	libs/simulations/avalanche-simulation/resources/training-data/data_3_dem.txt
+startingZoneFile	libs/simulations/avalanche-simulation/resources/training-data/data_3_startzones.bmp
+flowPathOutputFile	libs/simulations/avalanche-simulation/resources/training-data/data_3_flowpath
+pathFile			libs/simulations/avalanche-simulation/resources/training-data/data_3_path.bmp
+pathDistanceFile	libs/simulations/avalanche-simulation/resources/training-data/data_3_pathdistance.bmp
+verboseOutput		1
+
+#initialHeight		8.54051
+#bounceFriction		0.100513
+#stickyness			0.4715007
+#dampingForce		0.115659
+#turbulanceForce	3.90555
+#clumpingFactor		0.676779
+#viscosity			0.155534
+#gridSize			71.5451
+
+
+maxIterations		2000
+
+initialHeight		200
+bounceFriction		0.025
+stickyness			0.5
+dampingForce		0.01
+turbulanceForce		0.16
+clumpingFactor		0.5
+viscosity			0.25
+gridSize			128
+framesPerSecond		60

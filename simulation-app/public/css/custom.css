@@ -1,0 +1,66 @@
+#menu.navbar-default .navbar-brand {
+    color: rgba(255, 255, 255, 1);
+}
+
+#menu.navbar-default {
+    font-size: 14px;
+    background-color: rgba(244, 121, 33, 1);
+    border-width: 0px;
+    border-radius: 0px;
+}
+
+#menu.navbar-default .navbar-nav>li>a {
+    color: rgba(0, 0, 0, 1);
+    background-color: rgba(244, 121, 33, 1);
+}
+
+#menu.navbar-default .navbar-nav>li>a:hover, #menu.navbar-default .navbar-nav>li>a:focus {
+    color: rgba(255, 255, 255, 1);
+    background-color: rgba(244, 121, 33, 1);
+    background: -webkit-linear-gradient(top, rgba(0, 0, 0, 1) 0%, rgba(244, 121, 33, 1) 100%);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(244, 121, 33, 1) 100%);
+}
+
+#menu.navbar-default .navbar-nav>.active>a, #menu.navbar-default .navbar-nav>.active>a:hover, 
+#menu.navbar-default .navbar-nav>.active>a:focus {
+    color: rgba(255, 255, 255, 1);
+    background-color: rgba(0, 0, 0, 1);
+}
+
+#menu.navbar-default .navbar-toggle {
+    border-color: #000000;
+}
+
+#menu.navbar-default .navbar-toggle:hover, #menu.navbar-default .navbar-toggle:focus {
+    background-color: #000000;
+}
+
+#menu.navbar-default .navbar-toggle .icon-bar {
+    background-color: #000000;
+}
+
+#menu.navbar-default .navbar-toggle:hover .icon-bar, #menu.navbar-default .navbar-toggle:focus .icon-bar {
+    background-color: #f47921;
+}
+
+.navbar-default {
+    background-image: none;
+}
+
+.navbar-brand {
+    padding: 5px 15px;
+}
+
+.container {
+    width: 90%;
+}
+
+.label-black {
+    background-color: black;
+    color: white;
+}
+
+.btn-orange {
+    background-color: #f47921;
+    color: white;
+}
