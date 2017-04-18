@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{9a6b94da-070a-4540-9692-7b97b52c3c4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Simulation">
+      <UniqueIdentifier>{9553aefc-b618-45d6-8fb7-72536097a010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Terrain">
+      <UniqueIdentifier>{8a932eed-d2ad-479c-b5c1-1d28a2ac85bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XlibSlim">
+      <UniqueIdentifier>{35307bf2-63b0-4d10-9f8c-a096842eff8f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="cpp\shaderloader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cpp\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="simulation\massmovementsimulator.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="simulation\simulationfactory.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="simulation\simulationcontroller.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\terrain\terrain.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\terrain\terrainquad.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\terrain\terrainvertex.h">
+      <Filter>Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\core\particle.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\core\particlebucket.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="headers\core\simulationsettings.h">
+      <Filter>Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="xlib-slim\xarray.h">
+      <Filter>XlibSlim</Filter>
+    </ClInclude>
+    <ClInclude Include="xlib-slim\ximage.h">
+      <Filter>XlibSlim</Filter>
+    </ClInclude>
+    <ClInclude Include="xlib-slim\xlib.h">
+      <Filter>XlibSlim</Filter>
+    </ClInclude>
+    <ClInclude Include="xlib-slim\xmath.h">
+      <Filter>XlibSlim</Filter>
+    </ClInclude>
+    <ClInclude Include="xlib-slim\xvector.h">
+      <Filter>XlibSlim</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="videosettings.txt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="simulationsettings.txt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ga_settings.txt">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="packages.config" />
+    <None Include="shaders\ParticleFragmentShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\ParticleVertexShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\TerrainFragmentShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\TerrainVertexShader.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
