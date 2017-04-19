@@ -63,7 +63,6 @@ var app = new Vue({
             socket = io.connect();
             
             socket.on("receive all settings", function(data) {
-                console.timeEnd("settings");
                 app.initialHeight = data["initialHeight"];
                 app.bounceFriction = data["bounceFriction"];
                 app.stickiness = data["stickyness"];
@@ -76,15 +75,13 @@ var app = new Vue({
                 app.showSuccess("Initial Settings Loaded");
             });
 
-            socket.on("receive terrain data", function(data) {
-                console.timeEnd("terrain");                
+            socket.on("receive terrain data", function(data) {           
                 terrainData = data;
                 app.showSuccess("Terrain Loaded");
                 setUpWebgl();
             });
 
-            socket.on("receive next frame", function(data) {
-                console.timeEnd("frame");                
+            socket.on("receive next frame", function(data) {          
                 nextFrame = data;
                 nextFrameReady = true;
             });
@@ -119,20 +116,17 @@ var app = new Vue({
 
 //Method designed to request all simulation settings
 function requestAllSettings() {
-    console.time("settings");
     socket.emit("request all settings", {});
 }
 
 //Method designed to request the terrain data
 function requestTerrainData() {
-    console.time("terrain");
     socket.emit("request terrain data", {});
 }
 
 //Method designed to request the next frame
 function requestNextFrame() {
     nextFrameReady = false;
-    console.time("frame");
     socket.emit("request next frame", {});
 }
 
