@@ -80,12 +80,12 @@ Features planned for the future include:
     <li>Pull the application from Github</li>
     <li>Install NodeJS and NPM.</li>
     <li>Ensure that Python 2.7 is installed on your machine and that the proper build tools for C++ are installed.</li>
-    <li>In the command line, run npm install -g node-gyp.</li>
-    <li>Now, in the ../simulation-app/ directory, attempt to run npm install. If this fails, run node-gyp configure and then node-gyp build. Then, retry npm install.</li>
-    <li>Now, there should be both a node_modules folder and a build folder in the ../simulation-app/ directory.</li>
+    <li>In the command line, run <code>npm install -g node-gyp</code>.</li>
+    <li>Now, in the <code>../simulation-app/</code> directory, attempt to run <code>npm install</code>. If this fails, <code>run node-gyp configure</code> and then <code>node-gyp build</code>. Then, retry <code>npm install</code>.</li>
+    <li>Now, there should be both a <code>node_modules</code> folder and a <code>build</code> folder in the <code>../simulation-app/</code> directory.</li>
 </ol>
 <br/>
-<p>After the project is set up, to rebuild the simulation, run the command node-gyp rebuild in the ../simulation-app/ directory. To run the application, use node server, and then the application will be running at localhost:3000. To allow changes to be made while the server is running, look into installing nodemon for node. If this is installed, simply run the application using nodemon in the command line.</p>
+<p>After the project is set up, to rebuild the simulation, run the command <code>node-gyp rebuild</code> in the <code>../simulation-app/</code> directory. To run the application, use node server, and then the application will be running at <code>localhost:3000</code>. To allow changes to be made while the server is running, look into installing nodemon for node. If this is installed, simply run the application using <code>nodemon</code> in the command line.</p>
 <br/>
 <h2>Last Update</h2>
 <br/>
