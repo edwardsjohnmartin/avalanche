@@ -52,6 +52,7 @@ void Init(v8::Local<v8::Object> exports) {
     exports->Set(Nan::New("removeSimulation").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(removeSimulation)->GetFunction());
     exports->Set(Nan::New("getNextSimulationFrame").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(getNextSimulationFrame)->GetFunction());
     exports->Set(Nan::New("getNextSimulationFrameFromGrid").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(getNextSimulationFrameFromGrid)->GetFunction());
+	exports->Set(Nan::New("skipSimulationFrames").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(skipSimulationFrames)->GetFunction());
     exports->Set(Nan::New("getSimulationTerrainData").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(getSimulationTerrainData)->GetFunction());
     exports->Set(Nan::New("getAllSimulationSettings").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(getAllSimulationSettings)->GetFunction());
     exports->Set(Nan::New("getSimulationInitialHeight").ToLocalChecked(), Nan::New<v8::FunctionTemplate>(getSimulationInitialHeight)->GetFunction());

@@ -1,0 +1,6 @@
+terrainColorFile	libs/simulations/avalanche-simulation/resources/terrain.bmp
+elevationDEMFile	libs/simulations/avalanche-simulation/resources/dem.txt
+startingZoneFile	libs/simulations/avalanche-simulation/resources/startzone.bmp
+flowPathOutputFile	libs/simulations/avalanche-simulation/resources/training-data/data_3_flowpath
+pathFile		libs/simulations/avalanche-simulation/resources/training-data/data_3_path.bmp
+pathDistanceFile	libs/simulations/avalanche-simulation/resources/training-data/data_3_pathdistance.bmp

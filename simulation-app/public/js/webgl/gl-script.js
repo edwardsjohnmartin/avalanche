@@ -2,6 +2,7 @@ var nextFrame; //Next render frame
 var currentFrame; //Current render frame
 var terrainData; //Terrain vertices and texture coordinates
 var lastRender = new Date();
+var lastFrameReq = new Date();
 
 var gl; //Webgl
 
@@ -34,6 +35,10 @@ var modelMatrix;
 var viewMatrix;
 var projectionMatrix;
 
+// FPS display
+var fpsElement;
+var timer = 0;
+
 var nextFrameReady = false;
 
 //Method designed to handle frame rate and adjust variables accordingly
@@ -41,12 +46,33 @@ function tick() {
     requestAnimFrame(tick);
 
     var now = new Date();
-    var timeElapsed = now.getTime() - lastRender.getTime();
-
-    if (timeElapsed > app.timePerFrame && nextFrameReady) {
+    var timeElapsed = now.getTime() - lastFrameReq.getTime();
+    var timeElapsedRender = now.getTime() - lastRender.getTime();
+    
+    //timing
+    timer += timeElapsed  
+    
+    // check if a new frame needs to be requested 
+    if (timeElapsed > app.timePerFrame && nextFrameReady) {       
+        
+        if(timer >= 250) {
+            fpsElement.innerHTML = Math.ceil(1/(timeElapsed * 0.001));  
+            timer = 0;
+        }
+        var steps = timeElapsed / app.timePerFrame;
+        if(steps > 10) steps = 10;
+        
+        dropFrames(steps);
         currentFrame = nextFrame;
         requestNextFrame();
-        render();
+        
+        lastFrameReq = new Date();
+    }
+    
+    //render @ 60 FPS
+    if(timeElapsedRender > 16.666) {
+        camera.tickShmooze(timeElapsed); //TO-DO: fix timing issue when changing tabs
+        render()
     }
 }
 
@@ -58,9 +84,11 @@ function render() {
     gl.useProgram(particleProgram);
 	gl.bindVertexArray(particleVAO);
 
+    camera.updateVPMat();
+    
 	gl.uniformMatrix4fv(particleModelMatrixLocation, false, flatten(modelMatrix));
-	gl.uniformMatrix4fv(particleViewMatrixLocation, false, flatten(viewMatrix));
-	gl.uniformMatrix4fv(particleProjectionMatrixLocation, false, flatten(projectionMatrix));
+	gl.uniformMatrix4fv(particleViewMatrixLocation, false, flatten(camera.mat_view));
+	gl.uniformMatrix4fv(particleProjectionMatrixLocation, false, flatten(camera.mat_proj));
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, particleVertexBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, flatten(currentFrame["vertices"]), gl.STATIC_DRAW);
@@ -75,8 +103,8 @@ function render() {
 	gl.bindVertexArray(terrainVAO);
 
 	gl.uniformMatrix4fv(terrainModelMatrixLocation, false, flatten(modelMatrix));
-	gl.uniformMatrix4fv(terrainViewMatrixLocation, false, flatten(viewMatrix));
-	gl.uniformMatrix4fv(terrainProjectionMatrixLocation, false, flatten(projectionMatrix));
+	gl.uniformMatrix4fv(terrainViewMatrixLocation, false, flatten(camera.mat_view));
+	gl.uniformMatrix4fv(terrainProjectionMatrixLocation, false, flatten(camera.mat_proj));
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, terrainVertexBuffer);
 	gl.drawArrays(gl.TRIANGLES, 0, terrainData["vertices"].length);
@@ -87,7 +115,9 @@ function render() {
 //Set up webgl
 function setUpWebgl() {
     var canvas = document.getElementById("gl-canvas");
-
+    fpsElement = document.getElementById("txt-fps");
+    console.log("Time: " + app.timePerFrame);
+    
     //Dynamically size canvas
     canvas.height = parseInt(getComputedStyle(document.getElementById('canvas-panel')).height.slice(0, -2));
     canvas.width = parseInt(getComputedStyle(document.getElementById('canvas-panel')).width.slice(0, -2));
@@ -188,6 +218,15 @@ function setUpWebgl() {
 		vec3(0.0, 1.0, 0.0) //up
 	);
 
+    // set up camera
+    camera.setAspectX(canvas.width);
+    camera.setAspectY(canvas.height);
+    camera.zoomedFocus = vec3(0, 0, 0);
+    camera.zoomedFTarget = camera.zoomedFocus;
+    
+    // set up controls
+    controls.setUpEvents(canvas);
+    
 	projectionMatrix = perspective(
 		45.0, //fov
 		canvas.width / canvas.height,

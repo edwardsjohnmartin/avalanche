@@ -34,25 +34,7 @@ void parseSettings(const string &settingsFile, MassMovementSimulator &simulator)
 		}
 
 		//TODO refactor if statement, potentially use map to fix this
-		if (param == "elevationDEMFile") {
-			line >> simulator.elevationDEMFile;
-		}
-		else if (param == "terrainColorFile") {
-			line >> simulator.terrainColorFile;
-		}
-		else if (param == "startingZoneFile") {
-			line >> simulator.startingZoneFile;
-		}
-		else if (param == "flowPathOutputFile") {
-			line >> simulator.flowPathOutputFile;
-		}
-		else if (param == "pathFile") {
-			line >> simulator.pathFile;
-		}
-		else if (param == "pathDistanceMap") {
-			line >> simulator.pathDistanceMapFile;
-		}
-		else if (param == "initialHeight") {
+		if (param == "initialHeight") {
 			line >> simulator.initialHeight;
 		}
 		else if (param == "bounceFriction") {
@@ -88,11 +70,58 @@ void parseSettings(const string &settingsFile, MassMovementSimulator &simulator)
 	}
 }
 
+// method designed to parse the data files to use in the simulation
+void parseData(const string &settingsFile, MassMovementSimulator &simulator) {
+	ifstream fin(settingsFile.c_str());
+	if (fin.fail()) {
+		cout << "ERROR: Failed to open file: " << settingsFile << endl;
+		return;
+	}
+	cout << "Loading data file: " << settingsFile << endl;
+
+	while (!fin.eof()) {
+		string tmpline;
+		stringstream line;
+		getline(fin, tmpline);
+		line << tmpline;
+		string param;
+		line >> param;
+
+		if (param.empty()) {
+			continue;
+		}
+		if (param[0] == '#') {
+			continue;
+		}
+
+		if (param == "elevationDEMFile") {
+			line >> simulator.elevationDEMFile;
+		}
+		else if (param == "terrainColorFile") {
+			line >> simulator.terrainColorFile;
+			std::cout << simulator.terrainColorFile << std::endl;
+		}
+		else if (param == "startingZoneFile") {
+			line >> simulator.startingZoneFile;
+		}
+		else if (param == "flowPathOutputFile") {
+			line >> simulator.flowPathOutputFile;
+		}
+		else if (param == "pathFile") {
+			line >> simulator.pathFile;
+		}
+		else if (param == "pathDistanceMap") {
+			line >> simulator.pathDistanceMapFile;
+		}
+	}
+}
+
 //Method designed to return an initialized simulation
-MassMovementSimulator buildSimulator(string fileName = "") {
+MassMovementSimulator buildSimulator(string datafile = "", string settingsfile = "") {
 	MassMovementSimulator simulator;
-	if (fileName != "") {
-		parseSettings(fileName, simulator);
+	if (datafile != "" && settingsfile != "") {
+		parseData(datafile, simulator);
+		parseSettings(settingsfile, simulator);
 	}
 	simulator.initTerrain();
 	simulator.initParticles();

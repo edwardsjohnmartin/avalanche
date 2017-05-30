@@ -8,6 +8,31 @@
 #ifndef GETNEXTSIMULATIONFRAME_H
 #define GETNEXTSIMULATIONFRAME_H
 
+ // Used to drop a given number of simulation frames 
+void skipSimulationFrames(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+	//Extract params
+	v8::String::Utf8Value param1(info[0]->ToString());
+	string id = string(*param1);
+
+	//TODO error checking
+	v8::String::Utf8Value param2(info[1]->ToString());
+	string stepsStr = string(*param2);
+	int steps = atoi(stepsStr.c_str());
+
+	//Check if the id already exists
+	if (simulations.count(id) == 0) {
+		Nan::ThrowTypeError(("No simulation with id: " + id + " exists").c_str());
+		return;
+	}
+
+	MassMovementSimulator &simulator = simulations[id];
+
+	for (int i = 0; i < steps; i++) {
+		//Update all particles
+		simulations[id].updateAllParticles();
+	}
+}
+
 //Method designed to get the next frame for the simulation indexed by the given id
 void getNextSimulationFrame(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     //Params checking

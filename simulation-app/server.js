@@ -3,6 +3,7 @@
  * @fileoverview Script used to create and handle an ExpressJS app with Sockets.io support
  * @author Zackary Hall (hallzac2@isu.edu) 
  * Created: March 2nd, 2017
+ * Edited: May 18th, 2017 by Sandro Pawlidis
  */
 
 //Import dependencies
@@ -38,8 +39,26 @@ io.sockets.on("connection", function(socket) {
     //Add a connection to the list
     connections.push(socket);
     console.log("connected: %s sockets connected", connections.length);
-    simulationManager.addSimulation(socket.id);
-
+    var datafile = "libs/simulations/avalanche-simulation/resources/simdata.txt";
+    var settingsfile = "libs/simulations/avalanche-simulation/resources/simsettings.txt";
+     
+    startSimulation(socket.id, datafile, settingsfile);
+    
+    socket.on("receive data file", function(data) {
+        console.log("new data file: " + data.value);
+        datafile = data.value;
+    });
+    
+    socket.on("receive settings file" , function(data) {
+        console.log("new settings file: " + data.value);
+        settingsfile = data.value;
+    });
+    
+    socket.on("reset simulation", function(data) {
+        simulationManager.removeSimulation(socket.id);
+        startSimulation(socket.id, datafile, settingsfile);
+    });
+    
     socket.on("request all settings", function(data) {
         socket.emit(
             "receive all settings", 
@@ -52,6 +71,12 @@ io.sockets.on("connection", function(socket) {
             "receive terrain data", 
             simulationManager.getSimulationTerrainData(socket.id)
         );
+    });
+    
+    socket.on("drop frames", function(data) {
+        if(data.value && data.value > 0) {
+            simulationManager.skipSimulationFrames(socket.id, data.value);
+        }
     });
 
     socket.on("request next frame", function(data) {
@@ -109,3 +134,10 @@ io.sockets.on("connection", function(socket) {
         console.log("disconnected: %s sockets connected", connections.length);
     });
 });
+
+// used to start a new simulation
+function startSimulation(id, datafile, settingsfile) {
+    if(datafile !== "" && settingsfile !== "") {
+        simulationManager.addSimulation(id, datafile, settingsfile);
+    }
+}

@@ -1,0 +1,13 @@
+verboseOutput		1
+
+maxIterations		2000
+
+initialHeight		200
+bounceFriction		0.025
+stickyness			0.5
+dampingForce		0.01
+turbulanceForce		0.16
+clumpingFactor		0.5
+viscosity			0.25
+gridSize			128
+framesPerSecond		60

@@ -100,6 +100,35 @@
             </div>
         </div>
     </div>
+
+    <div class="funct-controls"> 
+        <div class="col-sm-9">
+            <div class="col-sm-3">
+                <button type="button" class="btn btn-success" v-on:click="resetSimulation()">Restart</button>
+            </div>
+            <div class="col-sm-3">
+                <div class="col-sm-9">
+                <label class="control-label">Select Data File</label>
+                    <select id="select-data" onchange="changeDataFile(this)" class="form-control">
+                        <option data-datafile="libs/simulations/avalanche-simulation/resources/simdata.txt">Data 1</option>
+                        <option data-datafile="libs/simulations/avalanche-simulation/resources/simdata2.txt">Data 2</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="col-sm-9">
+                <label class="control-label">Select Settings File</label>
+                    <select id="select-settings" onchange="changeSettingsFile(this)" class="form-control">
+                        <option data-settingsfile="libs/simulations/avalanche-simulation/resources/simsettings.txt">Settings 1</option>
+                        <option data-settingsfile="libs/simulations/avalanche-simulation/resources/simsettings2.txt">Settings 2</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div>FPS: <span id="txt-fps"></span></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <% include partials/footer %>

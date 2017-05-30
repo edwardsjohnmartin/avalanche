@@ -8,6 +8,12 @@
 //Global vars
 var socket; //Web Socket
 
+var reqTime; // Timing
+var recTime;
+
+var lastLoadedData;
+var lastLoadedSettings;
+
 var app = new Vue({
     el: "#simulation",
     data: {
@@ -53,6 +59,28 @@ var app = new Vue({
         //Method designed to show an error message
         showError: function(msg, title = null) {
             toastr.error(msg, title);
+        }, 
+        //Used to reset the current simulation TODO: fix loading issue on first reset
+        resetSimulation: function() {
+            var selectdata = document.getElementById("select-data");
+            var selectsettings = document.getElementById("select-settings");
+            
+            toastr.success("reseting simulation", null);
+            socket.emit("reset simulation", {});  
+            
+            // check if a new data file has been selected
+            if(lastLoadedData !== selectdata.options[selectdata.selectedIndex].dataset.datafile) {
+                this.showInfo("Requesting Terrain");
+                lastLoadedData = selectdata.options[selectdata.selectedIndex].dataset.datafile
+                requestTerrainData();
+            }
+            
+            // check if a new settings file has been selected
+            if(lastLoadedSettings !== selectsettings.options[selectsettings.selectedIndex].dataset.settingsfile) {
+                this.showInfo("Requesting Initial Settings");
+                lastLoadedSettings = selectsettings.options[selectsettings.selectedIndex].dataset.settingsfile;
+                requestAllSettings();
+            }
         },
     },
 
@@ -82,6 +110,9 @@ var app = new Vue({
             });
 
             socket.on("receive next frame", function(data) {          
+                recTime = new Date();
+                //console.log(recTime - reqTime);
+                
                 nextFrame = data;
                 nextFrameReady = true;
             });
@@ -124,8 +155,28 @@ function requestTerrainData() {
     socket.emit("request terrain data", {});
 }
 
+// Used to changed the selected data file
+function changeDataFile(select) {
+    //console.log(select.options[select.selectedIndex].dataset.datafile);
+    socket.emit("receive data file", {value: select.options[select.selectedIndex].dataset.datafile});
+}
+
+// Used to change the selected settings file
+function changeSettingsFile(select) {
+    //console.log(select.options[select.selectedIndex].dataset.settingsfile);
+    socket.emit("receive settings file", {value: select.options[select.selectedIndex].dataset.settingsfile});
+}
+
+// Used to drop the given number of frames
+function dropFrames(steps) {
+    //console.log("dropping " + Math.floor(steps) + " frames");
+    socket.emit("drop frames", {value: Math.floor(steps)});
+}
+
 //Method designed to request the next frame
 function requestNextFrame() {
+    reqTime = new Date();
+    
     nextFrameReady = false;
     socket.emit("request next frame", {});
 }

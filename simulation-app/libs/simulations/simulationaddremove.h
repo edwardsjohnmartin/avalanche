@@ -11,14 +11,20 @@
 //Method designed to add a new simulation using the supplied id
 void addSimulation(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     //Params checking
-    if (info.Length() != 1 || !info[0]->IsString()) {
-        Nan::ThrowTypeError("Parameter Mismatch: Function requires (string id)");
+    if (info.Length() != 3 || !info[0]->IsString()) {
+        Nan::ThrowTypeError("Parameter Mismatch: Function requires (string id, string datafile, string settingsfile)");
         return;
     }
 
     //Extract params
     v8::String::Utf8Value param1(info[0]->ToString());
     string id = string(*param1);
+
+	v8::String::Utf8Value param2(info[1]->ToString());
+	string datafile = string(*param2);
+
+	v8::String::Utf8Value param3(info[2]->ToString());
+	string settingsfile = string(*param3);
 
     //Check if the id already exists
     if (simulations.count(id) == 1) {
@@ -27,7 +33,7 @@ void addSimulation(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     }
 
     //Add simulation
-    MassMovementSimulator simulator = buildSimulator("libs/simulations/avalanche-simulation/resources/simulationsettings.txt"); //TODO run as passed var
+    MassMovementSimulator simulator = buildSimulator(datafile, settingsfile);
     simulations.insert(pair<string, MassMovementSimulator>(id, simulator));
 
     logToFile("Simulation created with id: " + id);
