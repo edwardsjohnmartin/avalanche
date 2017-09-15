@@ -1,0 +1,69 @@
+<html>
+
+<head>
+	<meta charset="utf-8"/>
+
+    <!-- Webgl resources -->
+    <script type="text/javascript" src="webgl/MV.js"></script>
+    <script type="text/javascript" src="webgl/webgl-utils.js"></script>
+    <script type="text/javascript" src="webgl/gl-script.js"></script>
+    <script type="text/javascript" src="webgl/camera.js"></script>
+    <script type="text/javascript" src="webgl/controls.js"></script>
+    <script type="text/javascript" src="webgl/shaders/terrain-shaders.js"></script>
+    <script type="text/javascript" src="webgl/shaders/particle-shaders.js"></script>
+
+    <!-- Simulation resources -->
+    <script type="text/javascript" src="particle.js"></script>
+    <script type="text/javascript" src="terrainVertex.js"></script>
+    <script type="text/javascript" src="simulation.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+
+    <style>
+        label, input {
+            padding: 10px;
+        }
+
+        button {
+            font-size: 16px;
+            padding-top : 8px;
+            padding-bottom : 8px;
+            padding-right : 12px;
+            padding-left : 12px;
+            margin: 10px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <canvas id="gl-canvas" width="890" height="600">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+
+    <img id="texImage" src="resources/normalmap.bmp" hidden></img>
+
+    <div>
+        <label for="demInput">Terrain DEM:</label>
+        <input type="file" id="demInput" onchange="setTerrain()"/>
+
+        <label for="txtInput">Texture:</label>
+        <input type="file" id="txtInput" onchange="setTexture()"/>
+    </div>
+
+    <div>
+        <label for="bmpInput">Startzone BMP:</label>
+        <input type="file" id="bmpInput" onchange="setStartzone()"/>
+        <input type="text" id="txtParticleCount" value="10000"/>
+    </div>
+
+    <div>
+        <button type="button" id="btnStart" onclick="startSimulation()">Start</button>
+    </div>
+    
+    <div>
+
+    </div>
+
+</body>
+
+</html>
