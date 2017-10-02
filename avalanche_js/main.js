@@ -1,21 +1,25 @@
 var simulation = new Simulation();
 var particles = new Array();
 
+var demFile;
+var bmpFile;
 var texture;
 
 function startSimulation() {
-	console.log(simulation.getParticles()[0]);
-	if(terrainData && currentFrame) {
-		setUpWebgl();
+	if(!demFile) {
+		alert("No DEM selected!");
+		return;
 	}
-	else {
-		alert("No DEM or BMP selected!");
+
+	if(!terrainData) {
+		simulation.terrainFromDEM(demFile, loadTerrain);
+	} else {
+		loadTerrain();
 	}
 }
 
 function setTerrain() {
-	var demFile = document.getElementById('demInput').files[0];
-	simulation.terrainFromDEM(demFile, loadTerrain);
+	demFile = document.getElementById('demInput').files[0];
 }
 
 function setTexture() {
@@ -30,24 +34,31 @@ function setTexture() {
 	}
 }
 
-function loadTerrain() {
-	terrainData = simulation.getTerrainData();
+function setStartzone() {
+	bmpFile = document.getElementById('bmpInput').files[0];
 }
 
-function setStartzone() {
-    var count = parseFloat(txtParticleCount.value);
-    if(!count) {
-        aler("Not a valid input for particle count!");
-        return;
-    }
+function loadTerrain() {
+	if(!terrainData) {
+		terrainData = simulation.getTerrainData();
+	}
 
-  simulation.setParticleCount(count);
-	var bmpFile = document.getElementById('bmpInput').files[0];
+	var count = parseFloat(txtParticleCount.value);
+	if(!count) {
+		aler("Not a valid input for particle count!");
+		return;
+	}
+
+	simulation.setParticleCount(count);
 	simulation.startzoneFromBMP(bmpFile, loadStartzone);
 }
 
 function loadStartzone() {
 	currentFrame = simulation.getParticleData();
+
+	if(!gl) {
+		setUpWebgl();
+	}
 }
 
 function updateSimulation() {

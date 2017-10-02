@@ -58,7 +58,7 @@ function tick() {
         updateSimulation();
         var v = new Date().getTime() - time.getTime();
         //if(v > 0)
-        //  console.log(v);
+          //console.log(v);
         lastFrameReq = new Date();
     }
 

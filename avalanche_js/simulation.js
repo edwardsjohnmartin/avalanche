@@ -1,7 +1,12 @@
 var terrain; // bitmap
 var particles; // array of particles
+var particleCount;
 
 var particleGrid;
+var particleGridComplete;
+
+var particleVelGrid;
+var particleVelGridComplete;
 
 var sizeX;
 var sizeY;
@@ -14,15 +19,17 @@ var data = {};
 var gridSizeX;
 var gridSizeZ;
 
-var initialHeight = 100;
 var timestep = 0.16667;
-var gravity = -9.8;
-var stickyness = 0.5;
-var damping = 0.2;
-var viscosity = 0.025;
-var gridSize = 128;
 
-var particleCount;
+var gravity = -9.8;
+var initialHeight = 25;
+var restitution = 0.6;
+var clumpingFactor = 0.3;
+var viscosity = 0.25;
+var turbulance = 0.2;
+var stickyness = 0.5;
+var damping = 0.02;
+var gridSize = 128;
 
 // Constructor
 function Simulation() {
@@ -50,9 +57,9 @@ function Simulation() {
 		return particles;
 	}
 
-    this.setParticleCount = function (count) {
-        particleCount = count;
-    }
+  this.setParticleCount = function (count) {
+      particleCount = count;
+  }
 
 	this.updateAllParticles = function() {
 		updateAllParticlesUtil();
@@ -63,18 +70,25 @@ function Simulation() {
 function updateAllParticlesUtil() {
 	clearGrid();
 
-	var maxVel = 0;
-	var index = -1;
 	for(var i = 0; i < particles.length; i++) {
 		updateParticle(i);
-		var vel = particles[i].magnitude();
-		if(vel > maxVel) {
-			maxVel = vel;
-			index = i;
-		}
 	}
 
-	console.log(index + ": " + maxVel);
+	for(var i = 0; i < gridSizeZ; i++) {
+		for(var j = 0; j < gridSizeX; j++) {
+			var count = particleGrid[i][j];
+			particleGridComplete[i][j] = count;
+
+			if(count <= 0) count = 1;
+
+			var v = particleVelGrid[i][j];
+			var u = particleVelGridComplete[i][j];
+
+			u.x = v.x / count;
+			u.y = v.y / count;
+			u.z = v.z / count;
+		}
+	}
 }
 
 // Update a single particle, specified by the index into the particle array
@@ -91,21 +105,14 @@ function updateParticle(index) {
 	if(posX < 1 || posZ < 1 || Math.floor(posX / cellSize) >= terrain.width - 1 || Math.floor(posZ / cellSize) >= terrain.depth - 1)
 		return;
 
-	// Check for collision
 	var hit = {};
 	var collision = trace(p, [posX, posY, posZ], hit);
 
-	// Compute density
-	//var density = computeDensity(p._x, p._z) * 0.0001;
-
-	//if(index === 0) console.log(particles[0]);
-	// If collision process collision
 	if(collision) {
 		if(posY < hit.pos[1]) {
 		 	p._y += 0.5 * (hit.pos[1] - posY);
 		}
 
-		// Compute normal
 		var norm = computeNormal(hit.pos[0], hit.pos[2]);
 		var mag = p.magnitude();
 
@@ -115,33 +122,45 @@ function updateParticle(index) {
 		var hitVy = hit.pos[1] - p._y;
 		var hitVz = hit.pos[2] - p._z;
 
+		// Compute distance to collision point
 		var hitMag = Math.sqrt(hitVx * hitVx + hitVy * hitVy + hitVz * hitVz);
 		var rdist = Math.abs(mag - hitMag);
 
+		// Divide timestep over total distance
 		var preTime = timestep * (hitMag / mag);
 		var postTime = timestep * (rdist / mag);
 
-		mag *= 0.55;
+		mag *= restitution;
 
-		var vZ = r[2] * mag;
 		var vX = r[0] * mag;
 		var vY = r[1] * mag;
+		var vZ = r[2] * mag;
 
 		p._x = hit.pos[0] + vX * postTime;
 		p._y = hit.pos[1] + vY * postTime;
 		p._z = hit.pos[2] + vZ * postTime;
 
-		p._velX = r[0] * mag;
-		p._velY = r[1] * mag;
-		p._velZ = r[2] * mag;
+		var density = computeDensity(p._x, p._z);
+		var gridVelocity = getGridVelocity(p._x, p._z);
+		var count = getGridCount(p._x, p._z);
+		if(count <= 0 ) count = 1;
 
-		var height = terrain[Math.floor(p._z / cellSize)][Math.floor(p._x / cellSize)]._y + 1;
+		p._velX = r[0] * mag + (Math.random() - 0.5) * density * turbulance;
+		p._velY = r[1] * mag;
+		p._velZ = r[2] * mag + (Math.random() - 0.5) * density * turbulance;
+
+		p._velX = (p._velX - gridVelocity.x * (viscosity / count)) * (1 - clumpingFactor) + gridVelocity.x * clumpingFactor;
+		p._velY = (p._velY - gridVelocity.y * (viscosity / count)) * (1 - clumpingFactor) + gridVelocity.y * clumpingFactor;
+		p._velZ = (p._velZ - gridVelocity.z * (viscosity / count)) * (1 - clumpingFactor) + gridVelocity.z * clumpingFactor;
+
+		var hX = clamp(Math.floor(p._x / cellSize), 0, terrain.width - 1);
+		var hZ = clamp(Math.floor(p._z / cellSize), 0, terrain.depth - 1);
+		var height = terrain[hZ][hX]._y + 1;
 
 		if(p._y < height)
 			p._y = height;
 
 	} else {
-		// Apply velocity to position
 		p._x += p._velX * timestep;
 		p._y += p._velY * timestep;
 		p._z += p._velZ * timestep;
@@ -151,9 +170,138 @@ function updateParticle(index) {
 		p.velZ += -p.velZ * damping;
 	}
 
-
-	//registerParticleToGrid(p);
+	registerParticleToGrid(p);
 }
+
+// ------------------------------------------------------------
+// GRID MECHANICS
+// ------------------------------------------------------------
+
+// Initialize particle grid
+function initGrid() {
+	gridSizeX = terrain.width * gridSize / 512;
+	gridSizeZ = terrain.depth * gridSize / 512;
+
+	particleGrid = [];
+	particleGridComplete = [];
+
+	particleVelGrid = [];
+	particleVelGridComplete = [];
+
+	for(var i = 0; i < gridSizeZ; i++) {
+		particleGrid[i] = [];
+		particleGridComplete[i] = [];
+
+		particleVelGrid[i] = [];
+		particleVelGridComplete[i] = [];
+
+		for(var j = 0; j < gridSizeX; j++) {
+			particleGrid[i][j] = 0;
+			particleGridComplete[i][j] = 0;
+
+			var v = {};
+			v.x = v.y = v.z = 0;
+			particleVelGrid[i][j] = v;
+
+			var u = {};
+			u.x = u.y = u.z = 0;
+			particleVelGridComplete[i][j] = u;
+		}
+	}
+}
+
+// Used to clear the particle grid
+function clearGrid() {
+	for(var i = 0; i < gridSizeZ; i++) {
+		for(var j = 0; j < gridSizeX; j++) {
+			particleGrid[i][j] = 0;
+
+			var v = particleVelGrid[i][j];
+			v.x = v.y = v.z = 0;
+		}
+	}
+}
+
+// Maps a particle to the appropriate grid cell
+function registerParticleToGrid(particle) {
+	var x = particle._x * gridSizeX / (terrain.width * cellSize);
+	var z = particle._z * gridSizeZ / (terrain.depth * cellSize);
+
+	var rX = Math.floor(x);
+	var rZ = Math.floor(z);
+
+	var addX = (x - rX > 0.5) ? rX + 1 : rX - 1;
+	var addZ = (z - rZ > 0.5) ? rZ + 1 : rZ - 1;
+
+	addX = clamp(addX, 0, gridSizeX - 1);
+	addZ = clamp(addZ, 0, gridSizeZ - 1);
+
+	rX = clamp(rX, 0, gridSizeX - 1);
+	rZ = clamp(rZ, 0, gridSizeZ - 1);
+
+	particleGrid[rZ][rX] += 1;
+	particleGrid[rZ][addX] += 1;
+	particleGrid[addZ][rX] += 1;
+	particleGrid[addZ][addX] += 1;
+
+	var v1 = particleVelGrid[rZ][rX];
+	v1.x += particle._velX;
+	v1.y += particle._velY;
+	v1.z += particle._velZ;
+
+	var v2 = particleVelGrid[rZ][addX];
+	v2.x += particle._velX;
+	v2.y += particle._velY;
+	v2.z += particle._velZ;
+
+	var v3 = particleVelGrid[addZ][rX];
+	v3.x += particle._velX;
+	v3.y += particle._velY;
+	v3.z += particle._velZ;
+
+	var v4 = particleVelGrid[addZ][addX];
+	v4.x += particle._velX;
+	v4.y += particle._velY;
+	v4.z += particle._velZ;
+}
+
+// Get the velocity of the corresponding grid cell
+function getGridVelocity(posX, posZ) {
+	var x = posX * gridSizeX / (terrain.width * cellSize);
+	var z = posZ * gridSizeZ / (terrain.depth * cellSize);
+
+	x = clamp(Math.floor(x), 0, gridSizeX - 1);
+	z = clamp(Math.floor(z), 0, gridSizeZ - 1);
+
+	return particleVelGridComplete[z][x];
+}
+
+// Get the numer of particles in the corresponding grid cell
+function getGridCount(posX, posZ) {
+	var x = posX * gridSizeX / (terrain.width * cellSize);
+	var z = posZ * gridSizeZ / (terrain.depth * cellSize);
+
+	x = clamp(Math.floor(x), 0, gridSizeX - 1);
+	z = clamp(Math.floor(z), 0, gridSizeZ - 1);
+
+	return particleGridComplete[z][x];
+}
+
+// Compute the density in a given gridCell
+function computeDensity(posX, posZ) {
+	var x = posX * gridSizeX / (terrain.width * cellSize);
+	var z = posZ * gridSizeZ / (terrain.depth * cellSize);
+
+	x = clamp(Math.floor(x), 0, gridSizeX - 1);
+	z = clamp(Math.floor(z), 0, gridSizeZ - 1);
+
+	var csize = cellSize / gridSizeZ;
+	return particleGridComplete[z][x] / (csize * csize) * 0.0001;
+}
+
+// ------------------------------------------------------------
+// COLLISION
+// ------------------------------------------------------------
 
 // Reflect the given vector over another vector
 function reflect(v, norm) {
@@ -167,62 +315,13 @@ function reflect(v, norm) {
 	return [v[0] - proj[0], v[1] - proj[1], v[2] - proj[2]];
 }
 
-// Compute the density at the given position
-function computeDensity(posX, posZ) {
-	if(posX < 1 || posZ < 1 || posX / cellSize >= terrain.width - 1 || posZ / cellSize >= terrain.depth - 1)
-		return 1;
-
-	var x = Math.floor(posX / (cellSize * cellSize));
-	var z = Math.floor(posZ / (cellSize * cellSize));
-
-	var count = particleGrid[z][x].length;
-
-	var csize = cellSize / terrain.depth;
-	return count / (csize * csize);
-}
-
-// Initialize particle grid
-function initGrid() {
-	gridSizeX = terrain.width * gridSize / 512;
-	gridSizeZ = terrain.depth * gridSize / 512;
-
-	particleGrid = [];
-	for(var i = 0; i < gridSizeZ; i++) {
-		particleGrid[i] = [];
-		for(var j = 0; j < gridSizeX; j++) {
-			particleGrid[i][j] = [];
-		}
-	}
-}
-
-// Used to clear the particle grid
-function clearGrid() {
-	for(var i = 0; i < gridSizeZ; i++) {
-		for(var j = 0; j < gridSizeX; j++) {
-			particleGrid[i][j] = [];
-		}
-	}
-}
-
-// NOTE: doesn't account for particles being above one another i.e. only x - z coordinates matter
-// Maps a particle to the appropriate grid cell
-function registerParticleToGrid(particle) {
-	var x = Math.floor(particle._x * terrain.depth / (terrain.depth * cellSize));
-	var z = Math.floor(particle._z * terrain.width / (terrain.width * cellSize));
-
-	var index = particleGrid[x][z].length;
-	particleGrid[x][z][index] = particle;
-
-
-}
-
 // Compute the normal of the given terrain position
 function computeNormal(posX, posZ) {
 	var x = Math.floor(posX / cellSize);
 	var z = Math.floor(posZ / cellSize);
 
 	if(x < 1 || z < 1 || x >= terrain.width - 1 || z >= terrain.depth - 1)
-		return [0, 0, 0];
+	return [0, 0, 0];
 
 	var difX = terrain[z][x - 1]._y - terrain[z][x]._y;
 	var difZ = terrain[z - 1][x]._y - terrain[z][x]._y;
@@ -294,6 +393,17 @@ function trace(start, end, hit) {
 
 	return false;
 }
+
+// Ensure value is between min and max
+function clamp(value, min, max) {
+	if(value > max) return max;
+	if(value < min) return min;
+	return value;
+}
+
+// ------------------------------------------------------------
+// UTIL
+// ------------------------------------------------------------
 
 // Setup the array used to hold particle data for webgl
 function setupParticleDataArray() {
@@ -431,8 +541,6 @@ function startzoneFromBMPUtil(bitmap) {
 			}
 		}
 	}
-
-	console.log(particles[0]);
 }
 
 // Used to create the terrain from a given DEM string
