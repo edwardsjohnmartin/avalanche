@@ -1,29 +1,36 @@
 //Terrain Vertex Shader
-var terrainVertexShaderSource = `#version 300 es
-    uniform mat4 modelMatrix;
-    uniform mat4 viewMatrix;
-    uniform mat4 projectionMatrix;
-    //uniform sampler2D tex;
-    in vec3 position;
-    in vec2 uvCoord;
-    out vec2 textureCoord;
-    
-    void main() {
-        textureCoord = uvCoord;
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1);
-    }
+var terrainVertexShaderSource = `
+  attribute vec3 vPosition;
+  attribute vec3 vNormal;
+
+  uniform mat4 mvMatrix;
+  uniform mat4 pMatrix;
+
+  varying mediump vec4 fColor;
+  varying highp vec3 vLighting;
+
+  void main() {
+    gl_Position = pMatrix * mvMatrix * vec4(vPosition, 1);
+
+    highp vec3 ambient = vec3(0.3, 0.3, 0.3);
+    highp vec3 lightColor = vec3(1, 1, 1);
+    highp vec3 direction = normalize(vec3(1, 0, 1));
+
+    highp vec4 normal = vec4(vNormal, 1);
+
+    highp float directional = max(dot(normal.xyz, direction), 0.0);
+    vLighting = ambient + (lightColor * directional);
+
+    fColor = vec4(0.7, 0.0, 0.0, 1.0);
+  }
 `
 
 //Terrain Fragment Shader
-var terrainFragmentShaderSource = `#version 300 es
-    precision mediump float;
+var terrainFragmentShaderSource = `
+  varying mediump vec4 fColor;
+  varying highp vec3 vLighting;
 
-    uniform sampler2D tex;
-    in vec2 textureCoord;
-    out vec4 outColor;
-    
-    void main() {
-        //outColor = vec4(0.2, 0.2, .2, 1.0);
-        outColor = texture(tex, textureCoord);
-    }
+  void main() {
+    gl_FragColor = vec4(fColor.rgb * vLighting, fColor.a);
+  }
 `

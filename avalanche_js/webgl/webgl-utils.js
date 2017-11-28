@@ -11,7 +11,7 @@ function createProgram(gl, vertexShaderSource, fragmentShaderSource) {
     if (success) {
         return program;
     }
-    
+
     console.log(gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
 }
@@ -25,9 +25,59 @@ function createShader(gl, type, source) {
     if (success) {
         return shader;
     }
-    
+
     console.log(gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
+}
+
+/**
+ * Creates a webgl context. If creation fails it will
+ * change the contents of the container of the <canvas>
+ * tag to an error message with the correct links for WebGL.
+ * @param {Element} canvas. The canvas element to create a
+ *     context from.
+ * @param {WebGLContextCreationAttirbutes} opt_attribs Any
+ *     creation attributes you want to pass in.
+ * @return {WebGLRenderingContext} The created context.
+ */
+var setupWebGL = function(canvas, opt_attribs) {
+  function showLink(str) {
+    var container = canvas.parentNode;
+    if (container) {
+      container.innerHTML = makeFailHTML(str);
+    }
+  };
+
+  if (!window.WebGLRenderingContext) {
+    showLink(GET_A_WEBGL_BROWSER);
+    return null;
+  }
+
+  var context = create3DContext(canvas, opt_attribs);
+  if (!context) {
+    showLink(OTHER_PROBLEM);
+  }
+  return context;
+};
+
+/**
+ * Creates a webgl context.
+ * @param {!Canvas} canvas The canvas tag to get context
+ *     from. If one is not passed in one will be created.
+ * @return {!WebGLContext} The created context.
+ */
+var create3DContext = function(canvas, opt_attribs) {
+  var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
+  var context = null;
+  for (var ii = 0; ii < names.length; ++ii) {
+    try {
+      context = canvas.getContext(names[ii], opt_attribs);
+    } catch(e) {}
+    if (context) {
+      break;
+    }
+  }
+  return context;
 }
 
 /**

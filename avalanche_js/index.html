@@ -7,8 +7,6 @@
     <script type="text/javascript" src="webgl/MV.js"></script>
     <script type="text/javascript" src="webgl/webgl-utils.js"></script>
     <script type="text/javascript" src="webgl/gl-script.js"></script>
-    <script type="text/javascript" src="webgl/camera.js"></script>
-    <script type="text/javascript" src="webgl/controls.js"></script>
     <script type="text/javascript" src="webgl/shaders/terrain-shaders.js"></script>
     <script type="text/javascript" src="webgl/shaders/particle-shaders.js"></script>
 
@@ -16,7 +14,8 @@
     <script type="text/javascript" src="particle.js"></script>
     <script type="text/javascript" src="terrainVertex.js"></script>
     <script type="text/javascript" src="simulation.js"></script>
-    <script type="text/javascript" src="main.js"></script>
+		<script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="output.js"></script>
 
     <style>
         label, input {
@@ -40,6 +39,10 @@
         Oops ... your browser doesn't support the HTML5 canvas element
     </canvas>
 
+		<canvas id="output-canvas" width="300" height="300">
+				Oops ... your browser doesn't support the HTML5 canvas element
+		</canvas>
+
     <img id="texImage" src="resources/normalmap.bmp" hidden></img>
 
     <div>
@@ -59,7 +62,7 @@
     <div>
         <button type="button" id="btnStart" onclick="startSimulation()">Start</button>
     </div>
-    
+
     <div>
 
     </div>

@@ -20,6 +20,8 @@ var gridSizeX;
 var gridSizeZ;
 
 var timestep = 0.16667;
+var maxSteps = 3000;
+var stepCount = 0;
 
 var gravity = -9.8;
 var initialHeight = 25;
@@ -68,6 +70,10 @@ function Simulation() {
 
 // Update all particles in the simulation
 function updateAllParticlesUtil() {
+	if(stepCount >= maxSteps)
+		return;
+
+	stepCount++;
 	clearGrid();
 
 	for(var i = 0; i < particles.length; i++) {
@@ -394,16 +400,17 @@ function trace(start, end, hit) {
 	return false;
 }
 
+
+// ------------------------------------------------------------
+// UTIL
+// ------------------------------------------------------------
+
 // Ensure value is between min and max
 function clamp(value, min, max) {
 	if(value > max) return max;
 	if(value < min) return min;
 	return value;
 }
-
-// ------------------------------------------------------------
-// UTIL
-// ------------------------------------------------------------
 
 // Setup the array used to hold particle data for webgl
 function setupParticleDataArray() {
@@ -436,6 +443,7 @@ function getParticleDataUtil() {
 function getTerrainDataUtil() {
 	var vertices = new Array();
 	var textureCoords = new Array();
+	var normals = new Array();
 
 	var index = 0;
 
@@ -443,54 +451,87 @@ function getTerrainDataUtil() {
 		for(var j = 0; j < sizeY - 1; j++) {
 			var curPosition;
 			var curTextureCoords;
-
-			// Triangle 1 - Vertex 1
-			curPosition = terrain[i][j].position();
-			curTextureCoords = terrain[i][j].textureCoords();
-
-			vertices[index] = curPosition;
-			textureCoords[index++] = [curTextureCoords[0], curTextureCoords[1]];
+			var u, v, v1, v2, v3;
+			var normal = {};
 
 			// Triangle 1 - Vertex 2
-			curPosition = terrain[i + 1][j].position();
+			v1 = curPosition = terrain[i + 1][j].position();
 			curTextureCoords = terrain[i + 1][j].textureCoords();
 
 			vertices[index] = curPosition;
 			textureCoords[index++] = [curTextureCoords[0], curTextureCoords[1]];
+			//normals.push(computeNormal(i + 1, j));
 
-			// Triangle 1 - Vertex 3
-			curPosition = terrain[i][j + 1].position();
-			curTextureCoords = terrain[i][j + 1].textureCoords();
+			// Triangle 1 - Vertex 1
+			v2 = curPosition = terrain[i][j].position();
+			curTextureCoords = terrain[i][j].textureCoords();
+			//normals.push(computeNormal(i, j));
 
 			vertices[index] = curPosition;
 			textureCoords[index++] = [curTextureCoords[0], curTextureCoords[1]];
 
-			// Triangle 2 - Vertex 1
-			curPosition = terrain[i][j + 1].position();
+
+			// Triangle 1 - Vertex 3
+			v3 = curPosition = terrain[i][j + 1].position();
 			curTextureCoords = terrain[i][j + 1].textureCoords();
+			//normals.push(computeNormal(i, j + 1));
+
+
+			vertices[index] = curPosition;
+			textureCoords[index++] = [curTextureCoords[0], curTextureCoords[1]];
+
+			// Compute triangle normal
+			u = subtract(v2, v1);
+			v = subtract(v3, v1);
+			normal.x = (u[1] * v[2]) - (u[2] * v[1]);
+			normal.y = (u[2] * v[0]) - (u[0] * v[2]);
+			normal.z = (u[0] * v[1]) - (u[1] * v[0]);
+			normal = normalize(vec3(normal.x, normal.y, normal.z));
+			normals.push([normal[0], normal[1], normal[2]]);
+			normals.push([normal[0], normal[1], normal[2]]);
+			normals.push([normal[0], normal[1], normal[2]]);
+
+			// Triangle 2 - Vertex 1
+			v1 = curPosition = terrain[i][j + 1].position();
+			curTextureCoords = terrain[i][j + 1].textureCoords();
+			//normals.push(computeNormal(i, j + 1));
 
 			vertices[index] = curPosition;
 			textureCoords[index++] = [curTextureCoords[0], curTextureCoords[1]];
 
 			// Triangle 2 - Vertex 2
-			curPosition = terrain[i + 1][j + 1].position();
+			v2 = curPosition = terrain[i + 1][j + 1].position();
 			curTextureCoords = terrain[i + 1][j + 1].textureCoords();
+			//normals.push(computeNormal(i + 1, j + 1));
 
 			vertices[index] = curPosition;
 			textureCoords[index++] = [curTextureCoords[0], curTextureCoords[1]];
 
 			// Triangle 2 - Vertex 3
-			curPosition = terrain[i + 1][j].position();
+			v3 = curPosition = terrain[i + 1][j].position();
 			curTextureCoords = terrain[i + 1][j].textureCoords();
+			//normals.push(computeNormal(i + 1, j));
 
 			vertices[index] = curPosition;
 			textureCoords[index++] = [curTextureCoords[0], curTextureCoords[1]];
+
+			// // Compute triangle normal
+			u = subtract(v2, v1);
+			v = subtract(v3, v1);
+			normal.x = (u[1] * v[2]) - (u[2] * v[1]);
+			normal.y = (u[2] * v[0]) - (u[0] * v[2]);
+			normal.z = (u[0] * v[1]) - (u[1] * v[0]);
+			normal = normalize(vec3(normal.x, normal.y, normal.z));
+			normals.push([normal[0], normal[1], normal[2]]);
+			normals.push([normal[0], normal[1], normal[2]]);
+			normals.push([normal[0], normal[1], normal[2]]);
 		}
 	}
 
 	var data = {};
-	data["vertices"] = vertices;
-	data["textureCoordinates"] = textureCoords;
+	data.vertices = vertices;
+	data.textureCoordinates = textureCoords;
+	data.normals = normals;
 
 	return data;
 }

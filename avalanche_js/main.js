@@ -5,6 +5,10 @@ var demFile;
 var bmpFile;
 var texture;
 
+window.onload = function() {
+	setupOutput();
+}
+
 function startSimulation() {
 	if(!demFile) {
 		alert("No DEM selected!");
